@@ -122,42 +122,6 @@ namespace RustRcon
         }
 
         /// <summary>
-        /// Prepare the byte array to send to the server.
-        /// </summary>
-        /// <returns></returns>
-        public byte[] GetBytes()
-        {
-            byte[] id = BitConverter.GetBytes(this.ID);
-            byte[] type = BitConverter.GetBytes(this.Type);
-            byte[] content = Encoding.UTF8.GetBytes(this.Content);
-            int size = id.Length + type.Length + content.Length + 2; // 2x "0x00" on content
-            byte[] bsize = BitConverter.GetBytes(size);
-            byte[] send = new byte[size + 4];
-
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(id);
-                Array.Reverse(type);
-                Array.Reverse(content);
-                Array.Reverse(bsize);
-            }
-
-            int position = 0;
-            foreach (byte b in bsize)
-                send[position++] = b;
-            foreach (byte b in id)
-                send[position++] = b;
-            foreach (byte b in type)
-                send[position++] = b;
-            foreach (byte b in content)
-                send[position++] = b;
-            send[position++] = 0;
-            send[position++] = 0;
-            
-            return send;
-        }
-
-        /// <summary>
         /// Register a callback to be called as soon as the package has validated, with the package itself as parameter.
         /// </summary>
         /// <param name="callback">Action to call</param>

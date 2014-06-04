@@ -117,17 +117,67 @@ namespace RustRcon
         /// Send a package to the server.
         /// </summary>
         /// <param name="package">Package to send to the server.</param>
-        public void SendPackage(Package package)
+        /// <returns>ID of the command</returns>
+        public int SendPackage(Package package)
         {
-            byte[] send = package.GetBytes();
+            byte[] send = getBytes(package);
             this.stream.Write(send, 0, send.Length);
             if (package.ValidationPackage != null)
             {
-                send = package.ValidationPackage.GetBytes();
+                send = getBytes(package.ValidationPackage);
                 this.stream.Write(send, 0, send.Length);
             }
             this.stream.Flush();
             this.packages.Add(package);
+
+            return package.ID;
+        }
+
+        /// <summary>
+        /// Send a simple command to the server.
+        /// </summary>
+        /// <param name="command">Command to send</param>
+        /// <returns>ID of the command</returns>
+        public int Send(string command)
+        {
+            return this.SendPackage(new Package(command));
+        }
+
+        /// <summary>
+        /// Prepare the byte array to send to the server.
+        /// </summary>
+        /// <param name="package">Package to be sent</param>
+        /// <returns>Byte array to be sent</returns>
+        private byte[] getBytes(Package package)
+        {
+            byte[] id = BitConverter.GetBytes(package.ID);
+            byte[] type = BitConverter.GetBytes(package.Type);
+            byte[] content = Encoding.UTF8.GetBytes(package.Content);
+            int size = id.Length + type.Length + content.Length + 2; // 2x "0x00" on content
+            byte[] bsize = BitConverter.GetBytes(size);
+            byte[] send = new byte[size + 4];
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(id);
+                Array.Reverse(type);
+                Array.Reverse(content);
+                Array.Reverse(bsize);
+            }
+
+            int position = 0;
+            foreach (byte b in bsize)
+                send[position++] = b;
+            foreach (byte b in id)
+                send[position++] = b;
+            foreach (byte b in type)
+                send[position++] = b;
+            foreach (byte b in content)
+                send[position++] = b;
+            send[position++] = 0;
+            send[position++] = 0;
+
+            return send;
         }
     }
 }
