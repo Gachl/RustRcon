@@ -18,15 +18,7 @@ namespace RustManager
             // Single command
             rcon.Send("say \"Thank [color#FF0000]you [color#FFFFFF]for choosing this RCON class.\"");
 
-            // Command with (multipart) reply, manual
-            int id = rcon.Send("status");
-            Package response = null;
-            while (response == null)
-                response = rcon.ReadPackage(id);
-            Match match = Regex.Match(response.Response, "players : (\\d+) ");
-            rcon.Send(String.Format("say \"There are currently {0} players connected.\"", match.Groups[1].Value));
-
-            // Command with (multipart) reply, automatic
+            // Command with (multipart) reply
             Package command = new Package("banlistex");
             command.RegisterCallback((Package result) => { rcon.Send(String.Format("say \"There are {0} entries on your ban list.\"", result.Response.Split('\n').Length)); }); // Note that result and command are the same object.
 
