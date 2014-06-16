@@ -4,4 +4,5 @@ Use this collection of classes to connect to your Rust server through RCON, mana
 
 This project compiles with mono.
 
-I am currently testing the stability and porting the old server manager from PHP to C#.
+This system is fairly stable.
+Check out the capabilities: net.connect rust.bloodisgood.org:28600
