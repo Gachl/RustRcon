@@ -22,6 +22,8 @@ namespace RustManager
             Package command = new Package("banlistex");
             command.RegisterCallback((Package result) => { rcon.Send(String.Format("say \"There are {0} entries on your ban list.\"", result.Response.Split('\n').Length)); }); // Note that result and command are the same object.
 
+            rcon.SendPackage(command);
+
             // Handle passive traffic (eg. chat, join and quit messages, ...)
             Task passive = new Task(() =>
                 {
